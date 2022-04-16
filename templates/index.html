@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>Multimodal data analysis</title>
+</head>
+
+<body>
+    <h1>Multimodal data analysis, sample total: {{total}}</h1>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.js"></script>
+
+    <div style="display: flex;">
+        <div>
+            <h2>Image information</h2>
+            <img id="image" src="http://127.0.0.1:8000/items/twitter_19_31_0_8.jpg">
+        </div>
+
+        <div style="margin-left: 8px;">
+            <h2>Text information</h2>
+            <p>
+                <strong>ID:</strong>
+            <p id="id"> </p> <br>
+            <strong>ImgId:</strong>
+            <p id="img_id"> </p><br>
+
+            <strong>Sentence:</strong>
+            <p id="sentence"> </p><br>
+            <div style="display: flex;">
+                <div>
+                    <strong>HeadEntity:</strong>
+                    <p style="color: red;" id="head_entity"></p><br>
+                </div>
+                <div style="margin-left: 50px;">
+                    <strong>TailEntity:</strong>
+                    <p style="color: blue;" id="tail_entity"> </p><br>
+                </div>
+                <div style="margin-left: 50px;">
+                    <strong>Relation:</strong>
+                    <p id="relation"> </p><br>
+                </div>
+            </div>
+            
+
+
+
+
+        </div>
+    </div>
+    <div>
+        <button onclick="left()">Previou</button>
+        <input id="page_number" placeholder="Input sample id" onchange="confirm()">
+        <button onclick="right()">Next</button>
+
+    </div>
+    <script>
+        var id = 0
+        function requestion(id) {
+            if (id < 0) {
+                id = 0
+            }
+            $.ajax({
+                type: "get", // 请求类型（get/post）
+                url: "http://127.0.0.1:8000/info/" + id, // 请求的地址
+                async: true, // 是否异步
+                dataType: "json", // 设置数据类型
+                success: function (data) {
+                    // 请求成功后的回调方法，进行数据赋值、显示等操作
+                    console.log(data);
+                    $("#image").attr("src", 'http://127.0.0.1:8000/items/' + data.img_id);
+                    var nv = document.getElementById("id");
+                    nv.innerHTML = id;
+                    var nv = document.getElementById("img_id");
+                    nv.innerHTML = data.img_id;
+                    var nv = document.getElementById("relation");
+                    nv.innerHTML = data.relation;
+                    var nv = document.getElementById("sentence");
+                    nv.innerHTML = data.sentence_html;
+                    var nv = document.getElementById("head_entity");
+                    nv.innerHTML = data.h.name;
+                    var nv = document.getElementById("tail_entity");
+                    nv.innerHTML = data.t.name;
+                },
+                error: function (errorMsg) {
+                    // 请求失败
+                    alert("请求失败");
+                }
+            });
+        }
+
+        requestion(id)
+
+        function confirm() {
+            console.log('123')
+            id = Number($(" #page_number").val())
+            requestion(id)
+        }
+
+        function left() {
+            id -= 1
+            requestion(id)
+        }
+        function right() {
+            id += 1
+            requestion(id)
+        }
+
+        $(document).keydown(function (event) {
+            if (event.keyCode == 37) {
+                console.log('left');
+                left()
+            }
+            if (event.keyCode == 39) {
+                console.log('right');
+                right()
+            }
+        });
+    </script>
+</body>
+<style type="text/css">
+    .head_entity{
+        color: red;
+    }
+    .tail_entity{
+        color: blue;
+    }
+    </style>
+</html>
